@@ -1,0 +1,128 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"strconv"
+	s "strings"
+)
+
+var p = fmt.Println
+
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
+func mergeFirstAndLastToInteger(first string, last string) int {
+
+	m := map[string]string{"one": "1", "two": "2", "three": "3", "four": "4", "five": "5", "six": "6", "seven": "7", "eight": "8", "nine": "9"}
+	candidates := [9]string{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
+
+	var part1 string
+	var part2 string
+	var merged_int int
+
+	_, e1 := strconv.Atoi(first)
+	if e1 == nil {
+		part1 = first
+	} else {
+		for i := 0; i < len(candidates); i++ {
+			if s.Contains(first, candidates[i]) {
+				part1 = m[candidates[i]]
+			}
+		}
+	}
+
+	_, e2 := strconv.Atoi(last)
+	if e2 == nil {
+		part2 = last
+	} else {
+		for i := 0; i < len(candidates); i++ {
+			if s.Contains(last, candidates[i]) {
+				part2 = m[candidates[i]]
+			}
+		}
+	}
+
+	var merged string = s.Join([]string{part1, part2}, "")
+	merged_int, _ = strconv.Atoi(merged)
+	return merged_int
+}
+
+func convertMapToList(m map[int]string) []string {
+	var list []string
+	for i := 0; i < 999; i++ {
+		if m[i] != "" {
+			list = append(list, m[i])
+		}
+	}
+	if len(list) == 1 {
+		p("list too short, merging")
+		list = append(list, list[0])
+	}
+	return list
+}
+
+func mapStringToIntegerIndex(input string) map[int]string {
+	m := make(map[int]string)
+	candidates := [18]string{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
+	for j := 0; j < len(candidates); j++ {
+		if s.Contains(input, candidates[j]) {
+			m[s.Index(input, candidates[j])] = candidates[j]
+		}
+	}
+	return m
+}
+
+func getNumberOfLines(file []byte) int {
+	var j int = 1
+	for i := 0; i < len(file); i++ {
+		if string(file[i]) == "\n" {
+			j++
+		}
+	}
+	return j
+}
+
+func splitInputToArrayOfString(file []byte) []string {
+	var nLines int = getNumberOfLines(file)
+	var list []string
+	var window int = 0
+	for i := 0; i < nLines; i++ {
+		var slice string
+		for j := window; j < len(file); j++ {
+			if string(file[j]) != "\n" {
+				slice = s.Join([]string{slice, string(file[j])}, "")
+			} else {
+				list = append(list, slice)
+				window = j + 1
+				break
+			}
+		}
+		// The end of the input does not have a new line,
+		// therefore append the last slice manually
+		if i == nLines-1 {
+			list = append(list, slice)
+		}
+	}
+	return list
+}
+
+func main() {
+	file, err := os.ReadFile("102_input.txt")
+	check(err)
+	var sum int = 0
+
+	inputAsListOfStrings := splitInputToArrayOfString(file)
+	for j := 0; j < len(inputAsListOfStrings); j++ {
+		p(inputAsListOfStrings[j])
+		m := mapStringToIntegerIndex(inputAsListOfStrings[j])
+		l := convertMapToList(m)
+		i := mergeFirstAndLastToInteger(l[0], l[len(l)-1])
+		sum += i
+		p("merged", i)
+	}
+	p("sum", sum)
+}
