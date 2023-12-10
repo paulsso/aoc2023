@@ -1,0 +1,77 @@
+package main
+
+// part 2
+// given r=(x1...xn), g=(y1...yn), b=(z1...zn) for a game
+// what is the smallest number of cube that game could have been played with
+
+import (
+	"fmt"
+	"os"
+	"regexp"
+	"strconv"
+)
+
+var p = fmt.Println
+
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
+func getNumberOfLines(file []byte) int {
+	var j int = 1
+	for i := 0; i < len(file); i++ {
+		if string(file[i]) == "\n" {
+			j++
+		}
+	}
+	return j
+}
+
+func getNumberOfCols(file []byte) int {
+	var j int = 0
+	for i := 0; i < len(file); i++ {
+		if string(file[i]) == "\n" {
+			break
+		}
+		j++
+	}
+	return j
+}
+
+func inputAsIntegerMatrix(file []byte) [][]int {
+	var rows int = getNumberOfLines(file)
+	var cols int = getNumberOfCols(file)
+
+	matrix := make([][]int, rows)
+
+	symbol, _ := regexp.Compile("([^\\.0-9])")
+	number, _ := regexp.Compile("([0-9])")
+	period, _ := regexp.Compile("([\\.])")
+
+	for i := 0; i < rows; i++ {
+		matrix[i] = make([]int, cols)
+		for j := 0; j < cols; j++ {
+			if period.MatchString(string(file[cols*i+j])) {
+				matrix[i][j] = 0
+			} else if number.MatchString(string(file[cols*i+j])) {
+				num, _ := strconv.Atoi(string(file[cols*i+j]))
+				matrix[i][j] = num
+			} else if symbol.MatchString(string(file[cols*i+j])) && string(file[cols*i+j]) != "\n" {
+				matrix[i][j] = 1
+			}
+		}
+	}
+	return matrix
+}
+
+func main() {
+	file, err := os.ReadFile("test.txt")
+	check(err)
+	matrix := inputAsIntegerMatrix(file)
+	p(matrix)
+	var sum int = 0
+
+	p(sum)
+}
